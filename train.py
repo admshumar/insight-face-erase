@@ -166,6 +166,9 @@ class Trainer:
                 output, target = self.process_batch(batch)
                 loss = Trainer.evaluate_loss(criterion, output, target)
 
+                if iteration % 25 == 0:
+                    print("ITERATION:", iteration)
+
                 # Clear data to prevent memory overload
                 del target
                 del output
