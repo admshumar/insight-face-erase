@@ -1,7 +1,5 @@
 # File management
-import os
 import glob
-import re
 
 # Argument parser
 import argparse
@@ -13,12 +11,6 @@ import torch.optim as optim
 
 # UNet
 from models import UNet
-
-# Pillow
-from PIL import Image
-
-# OpenCV
-import cv2
 
 # Math
 import math
@@ -57,11 +49,12 @@ parser.add_argument('--statedict', type=str, default="unet.pth",
 
 args = parser.parse_args()
 
+
 class Trainer:
 
     @classmethod
-    def intersection_over_union(cls, Y, Z):
-        iou = (torch.sum(torch.min(Y, Z))) / (torch.sum(torch.max(Y, Z)))
+    def intersection_over_union(cls, y, z):
+        iou = (torch.sum(torch.min(y, z))) / (torch.sum(torch.max(y, z)))
         return iou
 
     @classmethod
@@ -170,30 +163,14 @@ class Trainer:
                 if best_loss > loss_value:
                     best_loss = loss_value
                     best_iteration = iteration
-
-            # Plot the loss value
-            # if iteration%batch_size==0:
-            losses.append(loss_value)
-            #     if epoch % 5 == 0:
-            #         running_losses = losses[-5:]
-            #         average_loss = sum(running_losses)/len(running_losses)
-            #         plt.subplot(212)
-            #         plt.plot(average_loss)
-
-            # print("ITERATION:", iteration)
-            print("LOSS:", loss_value)
-            print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            # if self.epoch % 5 == 0:
-                # plt.ylabel("Cross Entropy Loss")
-                # plt.show()
+                losses.append(loss_value)
+                if batch == self.batches - 1:
+                    print("LOSS:", loss_value)
+                    print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
         print("Least loss", best_loss, "at iteration", best_iteration)
 
         torch.save(self.model.state_dict(), self.state_dict)
-
-    # def load_model(self):
-    #     self.model.load_state_dict(self.state_dict)
-    #     self.model.eval()
 
 
 trainer = Trainer(args.size, args.batchsize, args.epochs, args.lr, args.mom, args.seed, args.datadir, args.statedict)

@@ -16,6 +16,7 @@ class Loader:
     image_files = glob.glob(path_string+"/*.jpg")
     annotation_train_directory = "WIDER_images/WIDER_annotations/WIDER_train"
     annotation_val_directory = "WIDER_images/WIDER_annotations/WIDER_val"
+    # annotation_test_directory = "WIDER_images/WIDER_annotations/WIDER_test"
 
     def __init__(self, dimension):
         self.dimension = dimension
