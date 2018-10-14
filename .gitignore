@@ -4,6 +4,8 @@ weights/
 # .idea directory
 .idea/
 
+# Trivial edit
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
