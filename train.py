@@ -149,7 +149,9 @@ class Trainer:
         losses_val = []
 
         print("BEGIN TRAINING")
-        print("BATCHES:", self.batches)
+        print("TOTAL BATCHES:", self.batches)
+        print("TRAINING BATCHES:", self.train_size)
+        print("VALIDATION BATCHES:", self.batches-self.train_size)
         print("BATCH SIZE:", self.batch_size)
         print("EPOCHS:", self.epochs)
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
