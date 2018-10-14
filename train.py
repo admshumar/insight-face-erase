@@ -46,6 +46,8 @@ parser.add_argument('--datadir', type=str, default="WIDER_images_256/WIDER_train
                     help='Dataset Directory (Typically the default is used!)')
 parser.add_argument('--statedict', type=str, default="unet.pth",
                     help='Name of state dictionary for trained model')
+parser.add_argument('--trainvalsplit', type=float, default=0.85,
+                    help='Percent of input data to reserve for training')
 
 args = parser.parse_args()
 
@@ -64,6 +66,13 @@ class Trainer:
             batches = math.floor(batches) + 1
         return int(batches)
 
+    @classmethod
+    def evaluate_loss(cls, criterion, output, target):
+        loss_1 = criterion(output, target)
+        loss_2 = 1 - Trainer.intersection_over_union(output, target)
+        loss = loss_1 + 0.1 * loss_2
+        return loss
+
     def __init__(self,
                  side_length,
                  batch_size,
@@ -72,7 +81,8 @@ class Trainer:
                  momentum_parameter,
                  seed,
                  image_paths,
-                 state_dict):
+                 state_dict,
+                 train_val_split):
         self.side_length = side_length
         self.batch_size = batch_size
         self.epochs = epochs
@@ -84,6 +94,8 @@ class Trainer:
         self.model = UNet()
         self.loader = Loader(self.side_length)
         self.state_dict = state_dict
+        self.train_val_split = train_val_split
+        self.train_size = int(np.floor((self.train_val_split * self.batches)))
 
     def set_cuda(self):
         if torch.cuda.is_available():
@@ -92,6 +104,37 @@ class Trainer:
     def set_seed(self):
         if self.seed is not None:
             np.random.seed(self.seed)
+
+    def process_batch(self, batch):
+        # Grab a batch, shuffled according to the provided seed. Note that
+        # i-th image: samples[i][0], i-th mask: samples[i][1]
+        samples = Loader.get_batch(self.image_paths, self.batch_size, batch, self.seed)
+
+        # Cast samples into torch.FloatTensor for interaction with U-Net
+        samples = torch.from_numpy(samples)
+        samples = samples.float()
+
+        # Cast into a CUDA tensor, if GPUs are available
+        if torch.cuda.is_available():
+            samples = samples.cuda()
+
+        # Isolate images and their masks
+        samples_images = samples[:, 0]
+        samples_masks = samples[:, 1]
+
+        # Reshape for interaction with U-Net
+        samples_images = samples_images.unsqueeze(1)
+        samples_masks = samples_masks.unsqueeze(1)
+
+        # Run inputs through the model
+        output = self.model(samples_images)
+
+        # Clamp the target for proper interaction with BCELoss
+        target = torch.clamp(samples_masks, min=0, max=1)
+
+        del samples
+
+        return output, target
 
     def train_model(self):
         self.model.train()
@@ -102,58 +145,30 @@ class Trainer:
         best_iteration = 0
         best_loss = 10 ** 10
 
-        losses = []
+        losses_train = []
+        losses_val = []
 
         print("BEGIN TRAINING")
         print("BATCHES:", self.batches)
         print("BATCH SIZE:", self.batch_size)
         print("EPOCHS:", self.epochs)
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
         for k in range(0, self.epochs):
             print("EPOCH:", k + 1)
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            for batch in range(0, self.batches):
+
+            # Train
+            for batch in range(0, self.train_size):
                 iteration = iteration + 1
-
-                # Grab a batch, shuffled according to the provided seed. Note that
-                # i-th image: samples[i][0], i-th mask: samples[i][1]
-                samples = Loader.get_batch(self.image_paths, self.batch_size, batch, self.seed)
-
-                # Cast samples into torch.FloatTensor for interaction with U-Net
-                samples = torch.from_numpy(samples)
-                samples = samples.float()
-
-                # Cast into a CUDA tensor, if GPUs are available
-                if torch.cuda.is_available():
-                    samples = samples.cuda()
-
-                # Isolate images and their masks
-                samples_images = samples[:, 0]
-                samples_masks = samples[:, 1]
-
-                # Reshape for interaction with U-Net
-                samples_images = samples_images.unsqueeze(1)
-                samples_masks = samples_masks.unsqueeze(1)
-
-                print(samples_images.shape)
-
-                # Run inputs through the model
-                output = self.model(samples_images)
-
-                # Clamp the target for proper interaction with BCELoss
-                target = torch.clamp(samples_masks, min=0, max=1)
-
-                # Evaluate the loss
-                loss_1 = criterion(output, target)
-                loss_2 = 1 - Trainer.intersection_over_union(output, target)
-                loss = loss_1 + 0.1 * loss_2
+                output, target = self.process_batch(batch)
+                loss = Trainer.evaluate_loss(criterion, output, target)
 
                 # Clear data to prevent memory overload
                 del target
                 del output
-                del samples
 
-                # Clear gradients, backpropagate, and update weights
+                # Clear gradients, back-propagate, and update weights
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
@@ -163,18 +178,41 @@ class Trainer:
                 if best_loss > loss_value:
                     best_loss = loss_value
                     best_iteration = iteration
-                losses.append(loss_value)
-                if batch == self.batches - 1:
+                losses_train.append(loss_value)
+
+                if batch == self.train_size - 1:
                     print("LOSS:", loss_value)
                     print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
+            # Validate
+            for batch in range(self.train_size, self.batches):
+                output, target = self.process_batch(batch)
+                loss = Trainer.evaluate_loss(criterion, output, target)
+                loss_value = loss.item()
+                losses_val.append(loss_value)
+                print("VALIDATION LOSS:", loss_value)
+                print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                del output
+                del target
 
         print("Least loss", best_loss, "at iteration", best_iteration)
 
         torch.save(self.model.state_dict(), self.state_dict)
 
 
-trainer = Trainer(args.size, args.batchsize, args.epochs, args.lr, args.mom, args.seed, args.datadir, args.statedict)
+trainer = Trainer(args.size,
+                  args.batchsize,
+                  args.epochs,
+                  args.lr,
+                  args.mom,
+                  args.seed,
+                  args.datadir,
+                  args.statedict,
+                  args.trainvalsplit)
+
 trainer.set_cuda()
 trainer.set_seed()
+
 print(args)
+
 trainer.train_model()
