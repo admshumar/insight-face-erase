@@ -44,7 +44,7 @@ parser.add_argument('--seed', type=int, default=None, metavar='N',
                     help='NumPy Seed')
 parser.add_argument('--datadir', type=str, default="WIDER_images_256/WIDER_train/images/*/*.jpg",
                     help='Dataset Directory (Typically the default is used!)')
-parser.add_argument('--statedict', type=str, default="unet.pth",
+parser.add_argument('--statedict', type=str, default="weights.pth",
                     help='Name of state dictionary for trained model')
 parser.add_argument('--trainvalsplit', type=float, default=0.85,
                     help='Percent of input data to reserve for training')
@@ -197,7 +197,7 @@ class Trainer:
 
         print("Least loss", best_loss, "at iteration", best_iteration)
 
-        torch.save(self.model.state_dict(), self.state_dict)
+        torch.save(self.model.state_dict(), "weights/"+self.state_dict)
 
 
 trainer = Trainer(args.size,
