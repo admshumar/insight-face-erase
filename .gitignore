@@ -4,7 +4,10 @@ weights/
 # .idea directory
 .idea/
 
-# Trivial  edit
+# Scratch files
+scratch*
+
+# Trivial edit
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
