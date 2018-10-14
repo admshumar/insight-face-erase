@@ -1,6 +1,9 @@
 #Weight files from training
 weights/
 
+# .idea directory
+.idea/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
