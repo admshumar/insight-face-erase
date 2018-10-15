@@ -229,8 +229,8 @@ class Editor:
     @classmethod
     def make_binary_mask_from_torch(cls, image, scalar):
         image = image.detach().cpu().numpy()
-        height, width = image.shape
         image = np.squeeze(image)
+        height, width = image.shape
 
         new_mask = Editor.make_binary_mask(image, scalar)
         new_mask = new_mask.reshape(1, 1, height, width)
