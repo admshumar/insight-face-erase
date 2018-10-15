@@ -173,9 +173,9 @@ class Trainer:
                 iou = 0
                 for i in range(0, output.shape[0]):
                     binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
-                    iou += Trainer.intersection_over_union(binary_mask, target[i, :, :, :].cpu())
-                iou_train.append(iou.item())
-                print("IoU:", iou.item())
+                    iou = Trainer.intersection_over_union(binary_mask, target[i, :, :, :].cpu())
+                    iou_train.append(iou.item())
+                    print("IoU:", iou.item())
 
                 if iteration % 25 == 0:
                     print("ITERATION:", iteration)
@@ -211,9 +211,9 @@ class Trainer:
                 iou = 0
                 for i in range(0, output.shape[0]):
                     binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
-                    iou += (1/output.shape[0])*Trainer.intersection_over_union(binary_mask, target[i, :, :, :].cpu())
-                iou_val.append(iou.item())
-                print("IoU:", iou.item())
+                    iou = Trainer.intersection_over_union(binary_mask, target[i, :, :, :].cpu())
+                    iou_val.append(iou.item())
+                    print("IoU:", iou.item())
 
                 loss_value = loss.item()
                 losses_val.append(loss_value)

@@ -1,0 +1,7 @@
+bs4
+matplotlib
+numpy>=1.13
+opencv-python>=3.2
+scipy
+six
+torch
