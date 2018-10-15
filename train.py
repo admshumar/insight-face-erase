@@ -149,6 +149,9 @@ class Trainer:
         losses_train = []
         losses_val = []
 
+        iou_train = []
+        iou_val = []
+
         print("BEGIN TRAINING")
         print("TOTAL BATCHES:", self.batches)
         print("TRAINING BATCHES:", self.train_size)
@@ -171,6 +174,7 @@ class Trainer:
                 for i in range(0, output.shape[0]):
                     binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
                     iou += Trainer.intersection_over_union(binary_mask, target[i, :, :, :].cpu())
+                iou_train.append(iou.item())
                 print("IoU:", iou.item())
 
                 if iteration % 25 == 0:
@@ -196,16 +200,30 @@ class Trainer:
                     print("LOSS:", loss_value)
                     print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
+            average_iou = sum(iou_train)/len(iou_train)
+            print("Average IoU:", average_iou)
+
             # Validate
             for batch in range(self.train_size, self.batches):
                 output, target = self.process_batch(batch)
                 loss = Trainer.evaluate_loss(criterion, output, target)
+
+                iou = 0
+                for i in range(0, output.shape[0]):
+                    binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
+                    iou += (1/output.shape[0])*Trainer.intersection_over_union(binary_mask, target[i, :, :, :].cpu())
+                iou_val.append(iou.item())
+                print("IoU:", iou.item())
+
                 loss_value = loss.item()
                 losses_val.append(loss_value)
                 print("VALIDATION LOSS:", loss_value)
                 print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
                 del output
                 del target
+
+            average_iou = sum(iou_val) / len(iou_val)
+            print("Average IoU:", average_iou)
 
         print("Least loss", best_loss, "at iteration", best_iteration)
 
