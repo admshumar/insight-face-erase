@@ -236,7 +236,7 @@ class Editor:
         new_mask = new_mask.reshape(1, 1, height, width)
         new_mask = torch.from_numpy(new_mask)
 
-        return new_mask
+        return new_mask.float()
 
     @classmethod
     def reshape_for_display(cls, i, list_of_images):
