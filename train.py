@@ -170,7 +170,7 @@ class Trainer:
                 iou = 0
                 for i in range(0, output.shape[0]):
                     binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
-                    iou += Trainer.intersection_over_union(binary_mask, target[i, :, :, :])
+                    iou += Trainer.intersection_over_union(binary_mask, target[i, :, :, :].cpu())
                 print("IoU:", iou.item())
 
                 if iteration % 25 == 0:
