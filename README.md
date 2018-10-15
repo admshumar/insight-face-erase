@@ -5,7 +5,7 @@ This is a first step toward an open-source pipeline for human anonymization in v
 
 To this end, I chose the <a href="http://mmlab.ie.cuhk.edu.hk/projects/WIDERFace/">WIDER FACE dataset</a>, which is a richly annotated collection of over 32,000 images of human faces with a 40/10/50 train-validation-test split for each of its 61 event classes. Since this data set is currently being used in the <a href="http://wider-challenge.org/">Wider Face and Pedestrian Challenge</a>, annotation for the test set is unavailable. Thus my data consisted only of the train and validation subsets.
 
-The model is a PyTorch implementation of <a href="https://arxiv.org/abs/1505.04597">U-Net</a>, with a few modifications. U-Net is a fully-convolutional neural network that was originally designed for biomedical image segmentation. Since its introduction in 2015, it has found broader applications in computer vision, especially in image segmentation outside of a biomedical context. (For an example, see the <a href="https://www.kaggle.com/c/carvana-image-masking-challenge">Carvana Image Masking Challenge</a>.)
+The model is a PyTorch implementation of <a href="https://arxiv.org/abs/1505.04597">U-Net</a>, with a few modifications. U-Net is a fully-convolutional neural network that was originally designed for biomedical image segmentation. Since its introduction in 2015, it has found broader applications in computer vision. (For an example, see the <a href="https://www.kaggle.com/c/carvana-image-masking-challenge">Carvana Image Masking Challenge</a>.)
 
 <p align="center">
   <img src="https://github.com/admshumar/insight-face-erase/blob/master/img/unet.png">
