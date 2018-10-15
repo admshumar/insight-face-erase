@@ -1,6 +1,9 @@
 #Weight files from training
 weights/
 
+#WIDER_FACE images
+WIDER_images_256/
+
 # .idea directory
 .idea/
 
