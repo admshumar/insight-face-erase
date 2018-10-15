@@ -211,7 +211,7 @@ class Editor:
     # the least pixel intensity in the highest bin, then
     # use that value as a threshold for the image.
     @classmethod
-    def make_binary_mask(cls, image):
+    def make_binary_mask(cls, image, scalar):
         row_length = image.shape[0]
         column_length = image.shape[1]
 
@@ -222,7 +222,19 @@ class Editor:
         for i in range(0, row_length):
             for j in range(0, column_length):
                 if image[i, j] > threshold:
-                    new_mask[i, j] = 255.0
+                    new_mask[i, j] = scalar
+
+        return new_mask
+
+    @classmethod
+    def make_binary_mask_from_torch(cls, image, scalar):
+        image = image.detach().cpu().numpy()
+        height, width = image.shape
+        image = np.squeeze(image)
+
+        new_mask = Editor.make_binary_mask(image, scalar)
+        new_mask = new_mask.reshape(1, 1, height, width)
+        new_mask = torch.from_numpy(new_mask)
 
         return new_mask
 

@@ -20,6 +20,7 @@ import numpy as np
 
 # Custom data loader
 from utils import Loader
+from utils import Editor
 
 # Get arguments
 parser = argparse.ArgumentParser(description='UNet for WIDER FACE Dataset')
@@ -168,8 +169,9 @@ class Trainer:
 
                 iou = 0
                 for i in range(0, output.shape[0]):
-                    iou += Trainer.intersection_over_union(output[i,:,:,:], target[i,:,:,:])
-                print(iou)
+                    binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :])
+                    iou += Trainer.intersection_over_union(binary_mask, target[i, :, :, :])
+                print("IoU:", iou.item())
 
                 if iteration % 25 == 0:
                     print("ITERATION:", iteration)
