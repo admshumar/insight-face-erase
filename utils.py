@@ -1,14 +1,16 @@
-# A loader class that includes image and mask manipulation.
+# Classes for image and mask manipulation.
 
 import os
 import re
 import glob
 import cv2
+import torch
+import models
 import numpy as np
 from parser import Annotation
 from rectangle import Mask
 
-
+# Prepares image data for processing by UNet.
 class Loader:
 
     path_string = "WIDER_images/*/images/*"
@@ -190,3 +192,84 @@ class Loader:
         for file in filepaths:
             im = cv2.imread(file)
             cv2.imwrite(file, cv2.bitwise_not(im))
+
+
+# Post-processing of image masks outputs from UNet.
+class Editor:
+
+    @classmethod
+    def resize_mask(cls, image, height, width):
+        image = cv2.resize(image, (height, width), interpolation=cv2.INTER_LINEAR)
+        return image
+
+    @classmethod
+    def smooth_mask(cls, image, kernel_size=81):
+        image = cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
+        return image
+
+    # From the distribution of pixel intensities, select
+    # the least pixel intensity in the highest bin, then
+    # use that value as a threshold for the image.
+    @classmethod
+    def make_binary_mask(cls, image):
+        row_length = image.shape[0]
+        column_length = image.shape[1]
+
+        distribution = np.histogram(image)
+        threshold = distribution[1][len(distribution[1])-2]
+
+        new_mask = np.zeros(image.shape)
+        for i in range(0, row_length):
+            for j in range(0, column_length):
+                if image[i, j] > threshold:
+                    new_mask[i, j] = 255.0
+
+        return new_mask
+
+    @classmethod
+    def reshape_for_display(cls, i, list_of_images):
+        x = list_of_images[i]
+        if type(x) is torch.Tensor:
+            x = x.detach().cpu().numpy()
+        x = np.reshape(x, [256, 256])
+        return x
+
+    # Return the intersection over union of two NumPy arrays
+    @classmethod
+    def intersection_over_union(cls, y, z):
+        iou = (np.sum(np.minimum(y, z))) / (np.sum(np.maximum(y, z)))
+        return iou
+
+    def __init__(self, image_paths, seed_index):
+        self.image_paths = image_paths
+        self.seed_index = seed_index
+        self.samples = Loader.get_batch(self.image_paths, len(self.image_paths), 0, self.seed_index)
+        self.samples_images = self.samples[:, 0]
+        self.samples_masks = self.samples[:, 1]
+        self.model = models.UNet()
+
+    def initiate_model(self, state_dict):
+        self.model.load_state_dict(state_dict)
+        self.model.eval()
+        if torch.cuda.is_available():
+            self.model = self.model.cuda()
+
+    def get_raw_masks(self):
+        with torch.no_grad:
+            x = self.model(self.samples_images)
+        return x
+
+    def get_input(self, i, samples_images):
+        return self.reshape_for_display(i, samples_images)
+
+    def get_output(self, i, samples_images):
+        y = samples_images[i]
+        y = y.reshape(1, 1, y.shape[0], y.shape[1])
+        y = torch.from_numpy(y)
+        if torch.cuda.is_available():
+            y = y.cuda()
+        y = y.float()
+        y = self.model(y)
+        y = y.detach().cpu().numpy()
+        y = np.reshape(y, [256, 256])
+        return y

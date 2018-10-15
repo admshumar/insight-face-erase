@@ -19,7 +19,7 @@ import math
 import numpy as np
 
 # Custom data loader
-from processor import Loader
+from utils import Loader
 
 # Get arguments
 parser = argparse.ArgumentParser(description='UNet for WIDER FACE Dataset')
@@ -165,6 +165,11 @@ class Trainer:
                 iteration = iteration + 1
                 output, target = self.process_batch(batch)
                 loss = Trainer.evaluate_loss(criterion, output, target)
+
+                iou = 0
+                for i in range(0, output.shape[0]):
+                    iou += Trainer.intersection_over_union(output[i,:,:,:], target[i,:,:,:])
+                print(iou)
 
                 if iteration % 25 == 0:
                     print("ITERATION:", iteration)
