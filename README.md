@@ -1,5 +1,5 @@
 # insight-face-erase
-FaceErase is a deep learning pipeline for face anonymization that I developed during Autumn 2018 in the Insight Data Science program.
+FaceErase is a deep learning pipeline for face anonymization that I developed while in the Insight Data Science program in Autumn 2018.
 
 This is a first step toward an open-source pipeline for human anonymization in visual media. The ultimate goal is to develop a  tool that can anonymize human faces, license plates, and other sensitive objects in a broad variety of poses, lighting conditions, and scales.
 
