@@ -1,6 +1,9 @@
 #Weight files from training
 weights/
 
+#Plots
+plots/
+
 #WIDER_FACE images
 WIDER_images_256/
 
