@@ -21,6 +21,7 @@ import numpy as np
 # Custom data loader
 from utils import Loader
 from utils import Editor
+from utils import Visualizer
 
 # Get arguments
 parser = argparse.ArgumentParser(description='UNet for WIDER FACE Dataset')
@@ -28,7 +29,7 @@ parser = argparse.ArgumentParser(description='UNet for WIDER FACE Dataset')
 parser.add_argument('--batchsize', type=int, default=10, metavar='N',
                     help='input batch size for training (default: 10)')
 parser.add_argument('--train', action='store_true', default=False,
-                    help='Argument to train model (default: False)')
+                    help='Argument to train model (default: False)')  # REMOVE
 parser.add_argument('--epochs', type=int, default=10, metavar='N',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--lr', type=float, default=0.001, metavar='LR',
@@ -38,7 +39,7 @@ parser.add_argument('--mom', type=float, default=0.99, metavar='MOM',
 parser.add_argument('--cuda', action='store_true', default=False,
                     help='enables CUDA training (default: False)')
 parser.add_argument('--log-interval', type=int, default=1, metavar='N',
-                    help='batches to wait before logging training status')
+                    help='batches to wait before logging training status')  # REMOVE
 parser.add_argument('--size', type=int, default=256, metavar='N',
                     help='imsize')
 parser.add_argument('--seed', type=int, default=None, metavar='N',
@@ -150,12 +151,13 @@ class Trainer:
         losses_val = []
 
         iou_train = []
+        average_iou_train = []
         iou_val = []
+        average_iou_val = []
 
         print("BEGIN TRAINING")
-        print("TOTAL BATCHES:", self.batches)
         print("TRAINING BATCHES:", self.train_size)
-        print("VALIDATION BATCHES:", self.batches-self.train_size)
+        print("VALIDATION BATCHES:", self.batches - self.train_size)
         print("BATCH SIZE:", self.batch_size)
         print("EPOCHS:", self.epochs)
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -170,15 +172,14 @@ class Trainer:
                 output, target = self.process_batch(batch)
                 loss = Trainer.evaluate_loss(criterion, output, target)
 
-                iou = 0
+                # Aggregate intersection over union scores for each element in the batch
                 for i in range(0, output.shape[0]):
                     binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
                     iou = Trainer.intersection_over_union(binary_mask, target[i, :, :, :].cpu())
                     iou_train.append(iou.item())
                     print("IoU:", iou.item())
 
-                if iteration % 25 == 0:
-                    print("ITERATION:", iteration)
+                print("Batch", batch, "of", self.train_size)
 
                 # Clear data to prevent memory overload
                 del target
@@ -202,13 +203,14 @@ class Trainer:
 
             average_iou = sum(iou_train)/len(iou_train)
             print("Average IoU:", average_iou)
+            average_iou_train.append(average_iou)
+            Visualizer.save_loss_plot(average_iou_train, "average_iou_train.png")
 
             # Validate
             for batch in range(self.train_size, self.batches):
                 output, target = self.process_batch(batch)
                 loss = Trainer.evaluate_loss(criterion, output, target)
 
-                iou = 0
                 for i in range(0, output.shape[0]):
                     binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
                     iou = Trainer.intersection_over_union(binary_mask, target[i, :, :, :].cpu())
@@ -224,6 +226,8 @@ class Trainer:
 
             average_iou = sum(iou_val) / len(iou_val)
             print("Average IoU:", average_iou)
+            average_iou_val.append(average_iou)
+            Visualizer.save_loss_plot(average_iou_val, "average_iou_val.png")
 
         print("Least loss", best_loss, "at iteration", best_iteration)
 
