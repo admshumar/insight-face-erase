@@ -172,14 +172,14 @@ class Trainer:
                 output, target = self.process_batch(batch)
                 loss = Trainer.evaluate_loss(criterion, output, target)
 
+                print("Batch", batch, "of", self.train_size)
+
                 # Aggregate intersection over union scores for each element in the batch
                 for i in range(0, output.shape[0]):
                     binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
                     iou = Trainer.intersection_over_union(binary_mask, target[i, :, :, :].cpu())
                     iou_train.append(iou.item())
                     print("IoU:", iou.item())
-
-                print("Batch", batch, "of", self.train_size)
 
                 # Clear data to prevent memory overload
                 del target
