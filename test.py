@@ -118,7 +118,8 @@ class Tester:
         return output, target
 
     def test_model(self):
-        torch.load(self.model.state_dict(), "weights/" + self.state_dict)
+        buffered_state_dict = torch.load(self.model.state_dict(), "weights/" + self.state_dict)
+        self.model.load_state_dict(buffered_state_dict)
         self.model.eval()
 
         criterion = nn.BCELoss()
