@@ -6,6 +6,7 @@ import argparse
 
 # PyTorch
 import torch
+import torch.nn as nn
 
 # UNet
 from models import UNet
@@ -19,6 +20,7 @@ import numpy as np
 # Custom data loader
 from utils import Loader
 from utils import Editor
+from utils import Visualizer
 
 
 # Get arguments
@@ -53,6 +55,13 @@ class Tester:
         if not batches.is_integer():
             batches = math.floor(batches) + 1
         return int(batches)
+
+    @classmethod
+    def evaluate_loss(cls, criterion, output, target):
+        loss_1 = criterion(output, target)
+        loss_2 = 1 - Tester.intersection_over_union(output, target)
+        loss = loss_1 + 0.1 * loss_2
+        return loss
 
     def __init__(self,
                  side_length,
@@ -110,29 +119,34 @@ class Tester:
 
     def test_model(self):
         torch.load(self.model.state_dict(), "weights/" + self.state_dict)
+        self.model.eval()
 
-        # for batch in range(self.batches):
-        #     output, target = self.process_batch(batch)
-        #     loss = Trainer.evaluate_loss(criterion, output, target)
-        #
-        #     for i in range(0, output.shape[0]):
-        #         binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
-        #         iou = Trainer.intersection_over_union(binary_mask, target[i, :, :, :].cpu())
-        #         iou_val.append(iou.item())
-        #         print("IoU:", iou.item())
-        #
-        #     loss_value = loss.item()
-        #     losses_val.append(loss_value)
-        #     print("EPOCH:", self.epochs)
-        #     print("VALIDATION LOSS:", loss_value)
-        #     print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        #     del output
-        #     del target
-        #
-        # average_iou = sum(iou_val) / len(iou_val)
-        # print("Average IoU:", average_iou)
-        # average_iou_val.append(average_iou)
-        # Visualizer.save_loss_plot(average_iou_val, "average_iou_val.png")
+        criterion = nn.BCELoss()
+        iou_test = []
+        losses_test = []
+        average_iou_test = []
+
+        for batch in range(self.batches):
+            output, target = self.process_batch(batch)
+            loss = Tester.evaluate_loss(criterion, output, target)
+
+            for i in range(0, output.shape[0]):
+                binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
+                iou = Tester.intersection_over_union(binary_mask, target[i, :, :, :].cpu())
+                iou_test.append(iou.item())
+                print("TEST IoU:", iou.item())
+
+            loss_value = loss.item()
+            losses_test.append(loss_value)
+            print("TEST LOSS:", loss_value)
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            del output
+            del target
+
+        average_iou = sum(iou_test) / len(iou_test)
+        print("Average IoU:", average_iou)
+        average_iou_test.append(average_iou)
+        Visualizer.save_loss_plot(average_iou_test, "average_iou_test.png")
 
 
 tester = Tester(args.size,
