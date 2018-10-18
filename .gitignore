@@ -7,6 +7,9 @@ plots/
 #WIDER_FACE images
 WIDER_images_256/
 
+#Rename files
+rename.py
+
 # .idea directory
 .idea/
 

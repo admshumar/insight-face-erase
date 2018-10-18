@@ -92,7 +92,6 @@ class Tester:
         samples = Loader.get_batch(self.image_paths, self.batch_size, batch, self.seed)
         samples.astype(float)
         # Cast samples into torch.FloatTensor for interaction with U-Net
-        print(samples.dtype, samples[0][0], samples[0][1])
         samples = torch.from_numpy(samples)
         samples = samples.float()
 
@@ -125,18 +124,24 @@ class Tester:
 
         criterion = nn.BCELoss()
         iou_test = []
+        batch_iou_test = []
         losses_test = []
-        average_iou_test = []
 
         for batch in range(self.batches):
             output, target = self.process_batch(batch)
             loss = Tester.evaluate_loss(criterion, output, target)
 
             for i in range(0, output.shape[0]):
+                batch_iou = 0
                 binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
                 iou = Tester.intersection_over_union(binary_mask, target[i, :, :, :].cpu())
+
                 iou_test.append(iou.item())
                 print("TEST IoU:", iou.item())
+
+                batch_iou += iou.item()
+
+            batch_iou_test.append(batch_iou / output.shape[0])
 
             loss_value = loss.item()
             losses_test.append(loss_value)
@@ -145,10 +150,18 @@ class Tester:
             del output
             del target
 
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
         average_iou = sum(iou_test) / len(iou_test)
         print("Average IoU:", average_iou)
-        average_iou_test.append(average_iou)
-        Visualizer.save_loss_plot(average_iou_test, "average_iou_test.png")
+
+        average_batch_iou = sum(batch_iou_test) / len(batch_iou_test)
+        print("Average Batch IoU:", average_batch_iou)
+
+        Visualizer.save_loss_plot(average_iou, "average_iou.png")
+        Visualizer.save_loss_plot(average_batch_iou, "average_batch_iou.png")
+        Visualizer.save_loss_plot(losses_test, "losses_test.png")
 
 
 tester = Tester(args.size,
