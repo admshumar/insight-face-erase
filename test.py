@@ -90,7 +90,7 @@ class Tester:
         # Grab a batch, shuffled according to the provided seed. Note that
         # i-th image: samples[i][0], i-th mask: samples[i][1]
         samples = Loader.get_batch(self.image_paths, self.batch_size, batch, self.seed)
-
+        samples.astype(float)
         # Cast samples into torch.FloatTensor for interaction with U-Net
         print(samples.dtype, samples[0][0], samples[0][1])
         samples = torch.from_numpy(samples)
