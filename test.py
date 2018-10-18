@@ -18,6 +18,7 @@ import numpy as np
 
 # Custom data loader
 from utils import Loader
+from utils import Editor
 
 
 # Get arguments
@@ -108,8 +109,30 @@ class Tester:
         return output, target
 
     def test_model(self):
-        # Stuff.
-        return None
+        torch.load(self.model.state_dict(), "weights/" + self.state_dict)
+
+        # for batch in range(self.batches):
+        #     output, target = self.process_batch(batch)
+        #     loss = Trainer.evaluate_loss(criterion, output, target)
+        #
+        #     for i in range(0, output.shape[0]):
+        #         binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
+        #         iou = Trainer.intersection_over_union(binary_mask, target[i, :, :, :].cpu())
+        #         iou_val.append(iou.item())
+        #         print("IoU:", iou.item())
+        #
+        #     loss_value = loss.item()
+        #     losses_val.append(loss_value)
+        #     print("EPOCH:", self.epochs)
+        #     print("VALIDATION LOSS:", loss_value)
+        #     print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        #     del output
+        #     del target
+        #
+        # average_iou = sum(iou_val) / len(iou_val)
+        # print("Average IoU:", average_iou)
+        # average_iou_val.append(average_iou)
+        # Visualizer.save_loss_plot(average_iou_val, "average_iou_val.png")
 
 
 tester = Tester(args.size,
@@ -117,8 +140,6 @@ tester = Tester(args.size,
                 args.seed,
                 args.datadir,
                 args.statedict)
-
-torch.load(tester.model.state_dict(), "weights/"+tester.state_dict)
 
 tester.set_cuda()
 tester.set_seed()
