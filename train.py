@@ -47,7 +47,7 @@ parser.add_argument('--seed', type=int, default=None, metavar='N',
 parser.add_argument('--datadir', type=str, default="WIDER_images_256/WIDER_train/images/*/*.jpg",
                     help='Dataset Directory (Typically the default is used!)')
 parser.add_argument('--statedict', type=str, default="weights.pth",
-                    help='Name of state dictionary for trained model')
+                    help='Name of the state dictionary to be saved')
 parser.add_argument('--trainvalsplit', type=float, default=0.85,
                     help='Percent of input data to reserve for training')
 
@@ -171,7 +171,7 @@ class Trainer:
                 iteration = iteration + 1
                 output, target = self.process_batch(batch)
                 loss = Trainer.evaluate_loss(criterion, output, target)
-
+                print("/nEPOCH:", self.epochs)
                 print("Batch", batch, "of", self.train_size)
 
                 # Aggregate intersection over union scores for each element in the batch
@@ -219,6 +219,7 @@ class Trainer:
 
                 loss_value = loss.item()
                 losses_val.append(loss_value)
+                print("EPOCH:", self.epochs)
                 print("VALIDATION LOSS:", loss_value)
                 print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
                 del output

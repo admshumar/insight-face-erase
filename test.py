@@ -21,16 +21,10 @@ from utils import Loader
 
 
 # Get arguments
-parser = argparse.ArgumentParser(description='UNet for WIDER FACE Dataset')
+parser = argparse.ArgumentParser(description='Test UNet on WIDER FACE Dataset')
 
 parser.add_argument('--batchsize', type=int, default=10, metavar='N',
                     help='input batch size for training (default: 10)')
-parser.add_argument('--epochs', type=int, default=10, metavar='N',
-                    help='number of epochs to train (default: 10)')
-parser.add_argument('--lr', type=float, default=0.001, metavar='LR',
-                    help='learning rate (default: 0.001)')
-parser.add_argument('--mom', type=float, default=0.99, metavar='MOM',
-                    help='SGD momentum (default=0.99)')
 parser.add_argument('--cuda', action='store_true', default=False,
                     help='enables CUDA training (default: False)')
 parser.add_argument('--size', type=int, default=256, metavar='N',
@@ -40,9 +34,7 @@ parser.add_argument('--seed', type=int, default=None, metavar='N',
 parser.add_argument('--datadir', type=str, default="WIDER_images_256/WIDER_val/images/*/*.jpg",
                     help='Dataset Directory (Typically the default is used!)')
 parser.add_argument('--statedict', type=str, default="weights.pth",
-                    help='Name of state dictionary for trained model')
-parser.add_argument('--trainvalsplit', type=float, default=0.85,
-                    help='Percent of input data to reserve for training')
+                    help='Name of state dictionary to be loaded')
 
 args = parser.parse_args()
 
@@ -125,6 +117,8 @@ tester = Tester(args.size,
                 args.seed,
                 args.datadir,
                 args.statedict)
+
+torch.load(tester.model.state_dict(), "weights/"+tester.state_dict)
 
 tester.set_cuda()
 tester.set_seed()

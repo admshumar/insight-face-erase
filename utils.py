@@ -341,6 +341,7 @@ class Editor:
         y = np.reshape(y, [256, 256])
         return y
 
+
 class Visualizer:
 
     @classmethod
