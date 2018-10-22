@@ -5,32 +5,24 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-
-# Apply a NumPy array mask to a NumPy array image
-def invert_mask(mask):
-    inverter_array = 255 * np.ones(mask.shape)
-    mask = inverter_array - mask
-    return mask
-
-def apply_mask(image, mask):
-    return np.bitwise_and(image, mask)
-
-# Apply an anonymization procedure to a NumPy array
-def anonymize_image(image, mask, kernel_size):
-    X_faces = apply_mask(image, mask)
-    X_faces = cv2.GaussianBlur(X_faces, kernel_size, 0)
-
-    mask_complement = invert_mask(mask)
-    mask_complement = cv2.GaussianBlur(X_faces, kernel_size, 0)
-    X_nonfaces = apply_mask(image, mask_complement)
-
-    Y = X_faces + X_nonfaces
-
-    return Y
+from utils import Editor
 
 
-def show_applied_mask(image, mask):
-    X = apply_mask(image, mask)
-    plt.imshow(X, cmap="gray")
-    plt.show()
+class Anonymizer:
+
+    @classmethod
+    def apply_mask(cls, image, mask):
+        return np.bitwise_and(image, mask)
+
+    @classmethod
+    def anonymize_image(cls, image, mask):
+        im = Anonymizer.apply_mask(image, mask)
+        im = cv2.inpaint(im, mask, 10, cv2.INPAINT_TELEA)
+        return im
+
+    @classmethod
+    def show_applied_mask(cls, image, mask):
+        X = Anonymizer.apply_mask(image, mask)
+        plt.imshow(X, cmap="gray")
+        plt.show()
 

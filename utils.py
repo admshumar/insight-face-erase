@@ -253,6 +253,10 @@ class Loader:
 class Editor:
 
     @classmethod
+    def apply_mask(cls, image, mask):
+        return np.bitwise_and(image, mask)
+
+    @classmethod
     def resize_mask(cls, image, height, width):
         image = cv2.resize(image, (height, width), interpolation=cv2.INTER_LINEAR)
         return image
@@ -261,6 +265,25 @@ class Editor:
     def smooth_mask(cls, image, kernel_size=81):
         image = cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
         return image
+
+    # Apply a NumPy array mask to a NumPy array image
+    @classmethod
+    def invert_mask(cls, mask):
+        inverter_array = np.max(mask) * np.ones(mask.shape)
+        mask = inverter_array - mask
+        return mask
+
+    # Occlude objects in an image
+    @classmethod
+    def occlude_image(cls, image, mask):
+        x = Editor.apply_mask(image, mask)
+        return x
+
+    # Apply an anonymization procedure to a NumPy array
+    @classmethod
+    def inpaint_occluded_image(cls, image, mask):
+        im = cv2.inpaint(image, mask, 10, cv2.INPAINT_TELEA)
+        return im
 
     # From the distribution of pixel intensities, select
     # the least pixel intensity in the highest bin, then

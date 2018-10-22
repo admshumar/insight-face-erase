@@ -161,7 +161,6 @@ class Tester:
 
         Visualizer.save_loss_plot(average_iou, "average_iou.png")
         Visualizer.save_loss_plot(average_batch_iou, "average_batch_iou.png")
-        Visualizer.save_loss_plot(losses_test, "losses_test.png")
 
 
 tester = Tester(args.size,
