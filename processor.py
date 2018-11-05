@@ -6,7 +6,7 @@ import glob
 import cv2
 import numpy as np
 from parser import Annotation
-from rectangle import Mask
+from utils import Mask
 
 
 class Loader:
