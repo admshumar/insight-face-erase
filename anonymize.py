@@ -82,6 +82,7 @@ class Anonymizer:
         # i-th image: samples[i][0], i-th mask: samples[i][1]
         samples = Loader.get_batch(self.image_paths, self.batch_size, batch, None)
         samples.astype(float)
+        source = samples[0, :, :, :]
         # Cast samples into torch.FloatTensor for interaction with U-Net
         samples = torch.from_numpy(samples)
         samples = samples.float()
@@ -106,13 +107,12 @@ class Anonymizer:
 
         del samples
 
-        return output, target
+        return source, output, target
 
     def anonymize(self):
         count = 0
         for batch in range(self.batches):
-            source = batch[0, :, :, :]
-            output, target = self.process_batch(batch)
+            source, output, target = self.process_batch(batch)
             binary_mask = Editor.make_binary_mask_from_torch(output[0, :, :, :], 1.0)
             inverted_binary_mask = Editor.invert_mask(binary_mask)
             anonymized_image = Anonymizer.anonymize_image(source, inverted_binary_mask)
