@@ -57,10 +57,10 @@ class Anonymizer:
     @classmethod
     def anonymize_image(cls, image, mask):
         image = Anonymizer.check_for_numpy(image)
-        image = image.reshape(image.shape[-3:])
+        image = image.reshape(image.shape[-2:])
 
         mask = Anonymizer.check_for_numpy(mask)
-        mask = mask.reshape(mask.shape[-3:])
+        mask = mask.reshape(mask.shape[-2:])
 
         im = Anonymizer.apply_mask(image, mask)
         print(im.shape, mask.shape)
