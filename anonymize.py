@@ -62,7 +62,7 @@ class Anonymizer:
 
         mask = Anonymizer.check_for_numpy(mask)
         mask = mask.reshape(mask.shape[-2:])
-        mask = np.int8(mask)
+        mask = np.uint8(mask)
 
         im = Anonymizer.apply_mask(image, mask)
         print(im.shape, mask.shape)
