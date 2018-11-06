@@ -63,6 +63,7 @@ class Anonymizer:
         mask = mask.reshape(mask.shape[-3:])
 
         im = Anonymizer.apply_mask(image, mask)
+        print(im.shape, mask.shape)
         im = cv2.inpaint(im, mask, 10, cv2.INPAINT_TELEA)
 
         return im
