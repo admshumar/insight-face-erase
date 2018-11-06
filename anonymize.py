@@ -82,7 +82,6 @@ class Anonymizer:
         # Grab a batch, shuffled according to the provided seed. Note that
         # i-th image: samples[i][0], i-th mask: samples[i][1]
         samples = Loader.get_batch(self.image_paths, self.batch_size, batch, None)
-        source = samples[0, :, :, :]
         samples.astype(float)
         # Cast samples into torch.FloatTensor for interaction with U-Net
         samples = torch.from_numpy(samples)
@@ -98,6 +97,7 @@ class Anonymizer:
 
         # Reshape for interaction with U-Net
         samples_images = samples_images.unsqueeze(1)
+        source = samples_images
         samples_masks = samples_masks.unsqueeze(1)
 
         # Run inputs through the model
