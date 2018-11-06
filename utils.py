@@ -269,6 +269,8 @@ class Editor:
     # Apply a NumPy array mask to a NumPy array image
     @classmethod
     def invert_mask(cls, mask):
+        if isinstance(mask, torch.Tensor):
+            mask = mask.detach().cpu().numpy()
         inverter_array = np.max(mask) * np.ones(mask.shape)
         mask = inverter_array - mask
         return mask
