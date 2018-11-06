@@ -57,10 +57,10 @@ class Anonymizer:
     @classmethod
     def anonymize_image(cls, image, mask):
         image = Anonymizer.check_for_numpy(image)
-        image = image.reshape(image.shape[-2:])
+        image = image.reshape(image.shape[-3:])
 
         mask = Anonymizer.check_for_numpy(mask)
-        mask = mask.reshape(mask.shape[-2:])
+        mask = mask.reshape(mask.shape[-3:])
 
         im = Anonymizer.apply_mask(image, mask)
         im = cv2.inpaint(im, mask, 10, cv2.INPAINT_TELEA)
