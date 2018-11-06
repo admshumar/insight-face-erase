@@ -52,7 +52,8 @@ class Anonymizer:
 
     @classmethod
     def apply_mask(cls, image, mask):
-        return np.min(image, mask)
+        print(image.shape, mask.shape)
+        #return np.min(image, mask)
 
     @classmethod
     def anonymize_image(cls, image, mask):
