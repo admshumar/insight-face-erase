@@ -38,6 +38,12 @@ args = parser.parse_args()
 class Anonymizer:
 
     @classmethod
+    def check_for_numpy(cls, tensor):
+        if isinstance(tensor, torch.Tensor):
+            tensor = tensor.detach().cpu().numpy()
+        return tensor
+
+    @classmethod
     def get_number_of_batches(cls, image_paths, batch_size):
         batches = len(image_paths) / batch_size
         if not batches.is_integer():
@@ -50,6 +56,9 @@ class Anonymizer:
 
     @classmethod
     def anonymize_image(cls, image, mask):
+        Anonymizer.check_for_numpy(image)
+        Anonymizer.check_for_numpy(mask)
+
         im = Anonymizer.apply_mask(image, mask)
         im = cv2.inpaint(im, mask, 10, cv2.INPAINT_TELEA)
         return im
