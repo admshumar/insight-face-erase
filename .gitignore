@@ -1,6 +1,9 @@
 #Weight files from training
 weights/
 
+#Anonymization outputs
+outputs/
+
 #Plots
 plots/
 
