@@ -124,6 +124,7 @@ class Anonymizer:
             inverted_binary_mask = Editor.invert_mask(binary_mask)
             anonymized_image = Anonymizer.anonymize_image(source, binary_mask)
 
+            cv2.imwrite(self.write_path + "/orig_" + str(count) + ".jpg", source)
             cv2.imwrite(self.write_path + "/anon_" + str(count) + ".jpg", anonymized_image)
             count += 1
 
