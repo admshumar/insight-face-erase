@@ -52,7 +52,7 @@ class Anonymizer:
 
     @classmethod
     def apply_mask(cls, image, mask):
-        return np.bitwise_and(image, mask)
+        return np.min(image, mask)
 
     @classmethod
     def anonymize_image(cls, image, mask):
@@ -81,7 +81,7 @@ class Anonymizer:
         # Grab a batch, shuffled according to the provided seed. Note that
         # i-th image: samples[i][0], i-th mask: samples[i][1]
         samples = Loader.get_batch(self.image_paths, self.batch_size, batch, None)
-        source = samples[0, :, :, :].astype(int)
+        source = samples[0, :, :, :]
         samples.astype(float)
         # Cast samples into torch.FloatTensor for interaction with U-Net
         samples = torch.from_numpy(samples)
