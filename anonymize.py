@@ -56,8 +56,8 @@ class Anonymizer:
 
     @classmethod
     def anonymize_image(cls, image, mask):
-        Anonymizer.check_for_numpy(image)
-        Anonymizer.check_for_numpy(mask)
+        image = Anonymizer.check_for_numpy(image)
+        mask = Anonymizer.check_for_numpy(mask)
 
         im = Anonymizer.apply_mask(image, mask)
         im = cv2.inpaint(im, mask, 10, cv2.INPAINT_TELEA)
