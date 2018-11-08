@@ -118,12 +118,7 @@ class Tester:
         loss = loss_1 + 0.1 * loss_2
         return loss
 
-    def __init__(self,
-                 side_length,
-                 batch_size,
-                 seed,
-                 image_paths,
-                 state_dict):
+    def __init__(self, side_length, batch_size, seed, image_paths, state_dict):
         self.side_length = side_length
         self.batch_size = batch_size
         self.seed = seed
@@ -180,12 +175,12 @@ class Tester:
         criterion = nn.BCELoss()
         accuracy_count = 0
         image_count = 0
-        accuracy_test = []
-        recall_test = []
-        iou_test = []
-        dice_test = []
-        batch_iou_test = []
-        losses_test = []
+        accuracy_list = []
+        recall_list = []
+        iou_list = []
+        dice_list = []
+        batch_iou_list = []
+        losses_list = []
 
         for batch in range(self.batches):
             output, target = self.process_batch(batch)
@@ -209,36 +204,39 @@ class Tester:
                 if accuracy == 1:
                     accuracy_count += 1
 
-                accuracy_test.append(accuracy)
-                recall_test.append(recall)
-                iou_test.append(iou)
-                dice_test.append(dice)
+                accuracy_list.append(accuracy)
+                recall_list.append(recall)
+                iou_list.append(iou)
+                dice_list.append(dice)
 
                 print("Accuracy:", accuracy)
                 print("Recall:", recall)
-                print("Test IoU:", iou)
+                print("IoU:", iou)
                 print("Dice:", dice,"\n")
-                print("Mean Accuracy:", mean(accuracy_test))
-                print("Mean Recall:", mean(recall_test))
-                print("Mean Test IoU:", mean(iou_test))
-                print("Mean Dice:", mean(dice_test))
+                print("Mean Accuracy:", mean(accuracy_list))
+                print("Mean Recall:", mean(recall_list))
+                print("Mean IoU:", mean(iou_list))
+                print("Mean Dice:", mean(dice_list))
                 print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
                 batch_iou += iou
 
-            batch_iou_test.append(batch_iou / output.shape[0])
+            print(batch_iou)
+            print("Appending", batch_iou / output.shape[0])
+            batch_iou_list.append(batch_iou / output.shape[0])
+            print(batch_iou_list)
 
             loss_value = loss.item()
-            losses_test.append(loss_value)
-            print("TEST LOSS:", loss_value)
+            losses_list.append(loss_value)
+            print("Test loss:", loss_value)
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
             del output
             del target
 
-        mean_iou = mean(iou_test)
-        mean_accuracy = mean(accuracy_test)
-        mean_recall = mean(recall_test)
-        mean_dice = mean(dice_test)
+        mean_iou = mean(iou_list)
+        mean_accuracy = mean(accuracy_list)
+        mean_recall = mean(recall_list)
+        mean_dice = mean(dice_list)
 
         print("Perfect Accuracy Percentage:", accuracy_count / image_count)
         print("Mean Accuracy:", mean_accuracy)
@@ -247,10 +245,10 @@ class Tester:
         print("Mean Dice:", mean_dice)
 
 
-        average_batch_iou = sum(batch_iou_test) / len(batch_iou_test)
+        average_batch_iou = sum(batch_iou_list) / len(batch_iou_list)
         print("Average Batch IoU:", average_batch_iou)
 
-        Visualizer.save_loss_plot(iou_test, "iou_test.png")
+        Visualizer.save_loss_plot(iou_list, "iou_list.png")
 
         #Visualizer.save_loss_plot(mean_iou, "mean_iou.png")
         #Visualizer.save_loss_plot(average_batch_iou, "average_batch_iou.png")
