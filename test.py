@@ -236,10 +236,6 @@ class Tester:
         print("Mean IoU:", mean_iou)
         print("Mean Dice:", mean_dice)
 
-        Visualizer.save_loss_plot(iou_list, "iou_list.png")
-
-        Visualizer.save_loss_plot(mean_iou, "mean_iou.png")
-
 
 tester = Tester(args.size,
                 args.batchsize,
