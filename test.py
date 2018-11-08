@@ -215,8 +215,12 @@ class Tester:
 
                 print("Accuracy:", accuracy)
                 print("Recall:", recall)
-                print("TEST IoU:", iou)
-                print("Dice:", dice)
+                print("Test IoU:", iou)
+                print("Dice:", dice,"\n")
+                print("Mean Accuracy:", mean(accuracy_test))
+                print("Mean Recall:", mean(recall_test))
+                print("Mean Test IoU:", mean(iou_test))
+                print("Mean Dice:", mean(dice_test))
                 print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
                 batch_iou += iou
