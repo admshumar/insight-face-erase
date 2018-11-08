@@ -169,6 +169,10 @@ class Tester:
             output, target = self.process_batch(batch)
             loss = Tester.evaluate_loss(criterion, output, target)
 
+            print("Batch:", batch)
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
             for i in range(0, output.shape[0]):
                 batch_iou = 0
                 binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
@@ -184,6 +188,7 @@ class Tester:
                 print("Recall:", recall.item())
                 print("TEST IoU:", iou.item())
                 print("Dice:", dice.item())
+                print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
                 batch_iou += iou.item()
 
@@ -195,9 +200,6 @@ class Tester:
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
             del output
             del target
-
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
         average_iou = sum(iou_test) / len(iou_test)
         print("Average IoU:", average_iou)
