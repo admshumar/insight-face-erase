@@ -45,9 +45,47 @@ args = parser.parse_args()
 class Tester:
 
     @classmethod
-    def intersection_over_union(cls, y, z):
-        iou = (torch.sum(torch.min(y, z))) / (torch.sum(torch.max(y, z)))
+    def partition_masks(cls, output, target):
+        # Partition the union of the output and target into a true positive mask,
+        # a false positive mask, and a false negative mask
+        true_positive_mask = torch.min(output, target)
+        false_positive_mask = output - true_positive_mask
+        false_negative_mask = target - true_positive_mask
+        return true_positive_mask, false_positive_mask, false_negative_mask
+
+    @classmethod
+    def get_partition_measures(cls, output, target):
+        true_positive_mask, false_positive_mask, false_negative_mask = Tester.partition_masks(output, target)
+
+        tp = torch.sum(true_positive_mask) / (torch.sum(true_positive_mask) + torch.sum(false_positive_mask))
+        fp = torch.sum(false_positive_mask) / (torch.sum(true_positive_mask) + torch.sum(false_positive_mask))
+        fn = torch.sum(false_negative_mask) / (torch.sum(true_positive_mask) + torch.sum(false_negative_mask))
+
+        return tp, fp, fn
+
+    @classmethod
+    def get_dice(cls, output, target):
+        tp, fp, fn = Tester.get_partition_measures(output, target)
+        dice = (2*tp)/(2*tp + fp + fn)
+        return dice
+
+    @classmethod
+    def get_intersection_over_union(cls, output, target):
+        tp, fp, fn = Tester.get_partition_measures(output, target)
+        iou = tp / (tp + fp + fn)
         return iou
+
+    @classmethod
+    def get_accuracy(cls, output, target):
+        tp, fp, fn = Tester.get_partition_measures(output, target)
+        accuracy = tp / (tp + fp)
+        return accuracy
+
+    @classmethod
+    def get_recall(cls, output, target):
+        tp, fp, fn = Tester.get_partition_measures(output, target)
+        recall = tp / (tp + fn)
+        return recall
 
     @classmethod
     def get_number_of_batches(cls, image_paths, batch_size):
@@ -59,7 +97,7 @@ class Tester:
     @classmethod
     def evaluate_loss(cls, criterion, output, target):
         loss_1 = criterion(output, target)
-        loss_2 = 1 - Tester.intersection_over_union(output, target)
+        loss_2 = 1 - Tester.get_intersection_over_union(output, target)
         loss = loss_1 + 0.1 * loss_2
         return loss
 
@@ -134,10 +172,18 @@ class Tester:
             for i in range(0, output.shape[0]):
                 batch_iou = 0
                 binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
-                iou = Tester.intersection_over_union(binary_mask, target[i, :, :, :].cpu())
+
+                # Metrics
+                accuracy = Tester.get_accuracy(binary_mask, target[i, :, :, :].cpu())
+                recall = Tester.get_recall(binary_mask, target[i, :, :, :].cpu())
+                iou = Tester.get_intersection_over_union(binary_mask, target[i, :, :, :].cpu())
+                dice = Tester.get_dice(binary_mask, target[i, :, :, :].cpu())
 
                 iou_test.append(iou.item())
+                print("Accuracy:", accuracy)
+                print("Recall:", recall)
                 print("TEST IoU:", iou.item())
+                print("Dice:", dice)
 
                 batch_iou += iou.item()
 
