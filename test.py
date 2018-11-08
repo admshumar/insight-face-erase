@@ -13,6 +13,7 @@ from models import UNet
 
 # Math
 import math
+from statistics import mean
 
 # NumPy
 import numpy as np
@@ -169,7 +170,11 @@ class Tester:
         self.model.eval()
 
         criterion = nn.BCELoss()
+        accuracy_count = 0
+        accuracy_test = []
+        recall_test = []
         iou_test = []
+        dice_test = []
         batch_iou_test = []
         losses_test = []
 
@@ -191,7 +196,14 @@ class Tester:
                 iou = Tester.get_intersection_over_union(binary_mask, target[i, :, :, :].cpu())
                 dice = Tester.get_dice(binary_mask, target[i, :, :, :].cpu())
 
+                if accuracy == 1:
+                    accuracy_count += 1
+
+                accuracy_test.append(accuracy.item())
+                recall_test.append(recall.item())
                 iou_test.append(iou.item())
+                dice_test.append(dice.item())
+
                 print("Accuracy:", accuracy.item())
                 print("Recall:", recall.item())
                 print("TEST IoU:", iou.item())
@@ -209,15 +221,24 @@ class Tester:
             del output
             del target
 
-        average_iou = sum(iou_test) / len(iou_test)
-        print("Average IoU:", average_iou)
+        mean_iou = mean(iou_test) # sum(iou_test) / len(iou_test)
+        mean_accuracy = mean(accuracy_test)
+        mean_recall = mean(recall_test)
+        mean_dice = mean(dice_test)
+
+        print("")
+        print("Mean Accuracy:", mean_accuracy)
+        print("Mean Recall:", mean_recall)
+        print("Mean IoU:", mean_iou)
+        print("Mean Dice:", mean_dice)
+
 
         average_batch_iou = sum(batch_iou_test) / len(batch_iou_test)
         print("Average Batch IoU:", average_batch_iou)
 
         Visualizer.save_loss_plot(iou_test, "iou_test.png")
 
-        #Visualizer.save_loss_plot(average_iou, "average_iou.png")
+        #Visualizer.save_loss_plot(mean_iou, "mean_iou.png")
         #Visualizer.save_loss_plot(average_batch_iou, "average_batch_iou.png")
 
 
