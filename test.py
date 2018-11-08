@@ -180,10 +180,10 @@ class Tester:
                 dice = Tester.get_dice(binary_mask, target[i, :, :, :].cpu())
 
                 iou_test.append(iou.item())
-                print("Accuracy:", accuracy)
-                print("Recall:", recall)
+                print("Accuracy:", accuracy.item())
+                print("Recall:", recall.item())
                 print("TEST IoU:", iou.item())
-                print("Dice:", dice)
+                print("Dice:", dice.item())
 
                 batch_iou += iou.item()
 
