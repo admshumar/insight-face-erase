@@ -213,7 +213,6 @@ class Tester:
                 recall_test.append(recall)
                 iou_test.append(iou)
                 dice_test.append(dice)
-                print("Means:", mean(accuracy_test), mean(recall_test), mean(iou_test), mean(dice_test))
 
                 print("Accuracy:", accuracy)
                 print("Recall:", recall)
