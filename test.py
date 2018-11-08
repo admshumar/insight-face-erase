@@ -179,6 +179,7 @@ class Tester:
 
         criterion = nn.BCELoss()
         accuracy_count = 0
+        image_count = 0
         accuracy_test = []
         recall_test = []
         iou_test = []
@@ -195,6 +196,7 @@ class Tester:
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
             for i in range(0, output.shape[0]):
+                image_count += 1
                 batch_iou = 0
                 binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
 
@@ -239,7 +241,7 @@ class Tester:
         mean_recall = mean(recall_test)
         mean_dice = mean(dice_test)
 
-        print("Perfect Accuracy Percentage:", accuracy_count / self.batches)
+        print("Perfect Accuracy Percentage:", accuracy_count / image_count)
         print("Mean Accuracy:", mean_accuracy)
         print("Mean Recall:", mean_recall)
         print("Mean IoU:", mean_iou)
