@@ -189,10 +189,10 @@ class Tester:
             print("Batch:", batch)
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            batch_iou = 0
 
             for i in range(0, output.shape[0]):
                 image_count += 1
-                batch_iou = 0
                 binary_mask = Editor.make_binary_mask_from_torch(output[i, :, :, :], 1.0)
 
                 # Metrics
