@@ -66,24 +66,32 @@ class Tester:
     @classmethod
     def get_dice(cls, output, target):
         tp, fp, fn = Tester.get_partition_measures(output, target)
+        if tp + fp + fn == 0:
+            return -1
         dice = (2*tp)/(2*tp + fp + fn)
         return dice
 
     @classmethod
     def get_intersection_over_union(cls, output, target):
         tp, fp, fn = Tester.get_partition_measures(output, target)
+        if tp + fp + fn == 0:
+            return -1
         iou = tp / (tp + fp + fn)
         return iou
 
     @classmethod
     def get_accuracy(cls, output, target):
         tp, fp, fn = Tester.get_partition_measures(output, target)
+        if tp + fp == 0:
+            return -1
         accuracy = tp / (tp + fp)
         return accuracy
 
     @classmethod
     def get_recall(cls, output, target):
         tp, fp, fn = Tester.get_partition_measures(output, target)
+        if tp + fn == 0:
+            return -1
         recall = tp / (tp + fn)
         return recall
 
