@@ -173,7 +173,8 @@ class Tester:
         self.model.eval()
 
         criterion = nn.BCELoss()
-        accuracy_count = 0
+        perfect_accuracy_count = 0
+        zero_accuracy_count = 0
         image_count = 0
 
         accuracy_list = []
@@ -201,7 +202,9 @@ class Tester:
                 dice = Tester.get_dice(binary_mask, target[i, :, :, :].cpu())
 
                 if accuracy == 1:
-                    accuracy_count += 1
+                    perfect_accuracy_count += 1
+                if accuracy == 0:
+                    zero_accuracy_count += 1
 
                 accuracy_list.append(accuracy)
                 recall_list.append(recall)
@@ -230,7 +233,8 @@ class Tester:
         mean_recall = mean(recall_list)
         mean_dice = mean(dice_list)
 
-        print("Perfect Accuracy Percentage:", accuracy_count / image_count)
+        print("Perfect Accuracy Percentage:", perfect_accuracy_count / image_count)
+        print("Zero Accuracy Percentage:", zero_accuracy_count / image_count)
         print("Mean Accuracy:", mean_accuracy)
         print("Mean Recall:", mean_recall)
         print("Mean IoU:", mean_iou)
