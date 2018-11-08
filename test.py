@@ -215,8 +215,10 @@ class Tester:
         average_batch_iou = sum(batch_iou_test) / len(batch_iou_test)
         print("Average Batch IoU:", average_batch_iou)
 
-        Visualizer.save_loss_plot(average_iou, "average_iou.png")
-        Visualizer.save_loss_plot(average_batch_iou, "average_batch_iou.png")
+        Visualizer.save_loss_plot(iou_test, "iou_test.png")
+
+        #Visualizer.save_loss_plot(average_iou, "average_iou.png")
+        #Visualizer.save_loss_plot(average_batch_iou, "average_batch_iou.png")
 
 
 tester = Tester(args.size,
