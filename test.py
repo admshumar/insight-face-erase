@@ -72,7 +72,7 @@ class Tester:
         dice = (2*tp)/(2*tp + fp + fn)
         if math.isnan(dice):
             return 0
-        return dice
+        return dice.item()
 
     @classmethod
     def get_intersection_over_union(cls, output, target):
@@ -82,7 +82,7 @@ class Tester:
         iou = tp / (tp + fp + fn)
         if math.isnan(iou):
             return 0
-        return iou
+        return iou.item()
 
     @classmethod
     def get_accuracy(cls, output, target):
@@ -92,7 +92,7 @@ class Tester:
         accuracy = tp / (tp + fp)
         if math.isnan(accuracy):
             return 0
-        return accuracy
+        return accuracy.item()
 
     @classmethod
     def get_recall(cls, output, target):
@@ -102,7 +102,7 @@ class Tester:
         recall = tp / (tp + fn)
         if math.isnan(recall):
             return 0
-        return recall
+        return recall.item()
 
     @classmethod
     def get_number_of_batches(cls, image_paths, batch_size):
@@ -207,19 +207,19 @@ class Tester:
                 if accuracy == 1:
                     accuracy_count += 1
 
-                accuracy_test.append(accuracy.item())
-                recall_test.append(recall.item())
-                iou_test.append(iou.item())
-                dice_test.append(dice.item())
+                accuracy_test.append(accuracy)
+                recall_test.append(recall)
+                iou_test.append(iou)
+                dice_test.append(dice)
                 print("Means:", mean(accuracy_test), mean(recall_test), mean(iou_test), mean(dice_test))
 
-                print("Accuracy:", accuracy.item())
-                print("Recall:", recall.item())
-                print("TEST IoU:", iou.item())
-                print("Dice:", dice.item())
+                print("Accuracy:", accuracy)
+                print("Recall:", recall)
+                print("TEST IoU:", iou)
+                print("Dice:", dice)
                 print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
-                batch_iou += iou.item()
+                batch_iou += iou
 
             batch_iou_test.append(batch_iou / output.shape[0])
 
