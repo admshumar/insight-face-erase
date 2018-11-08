@@ -70,6 +70,8 @@ class Tester:
         if tp + fp + fn == 0:
             return -1
         dice = (2*tp)/(2*tp + fp + fn)
+        if math.isnan(dice):
+            return 0
         return dice
 
     @classmethod
@@ -78,6 +80,8 @@ class Tester:
         if tp + fp + fn == 0:
             return -1
         iou = tp / (tp + fp + fn)
+        if math.isnan(iou):
+            return 0
         return iou
 
     @classmethod
@@ -86,6 +90,8 @@ class Tester:
         if tp + fp == 0:
             return -1
         accuracy = tp / (tp + fp)
+        if math.isnan(accuracy):
+            return 0
         return accuracy
 
     @classmethod
@@ -94,6 +100,8 @@ class Tester:
         if tp + fn == 0:
             return -1
         recall = tp / (tp + fn)
+        if math.isnan(recall):
+            return 0
         return recall
 
     @classmethod
