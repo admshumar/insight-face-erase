@@ -203,6 +203,7 @@ class Tester:
                 recall_test.append(recall.item())
                 iou_test.append(iou.item())
                 dice_test.append(dice.item())
+                print("Lengths:", len(accuracy_test), len(recall_test), len(iou_test), len(dice_test))
 
                 print("Accuracy:", accuracy.item())
                 print("Recall:", recall.item())
@@ -221,12 +222,12 @@ class Tester:
             del output
             del target
 
-        mean_iou = mean(iou_test) # sum(iou_test) / len(iou_test)
+        mean_iou = mean(iou_test)
         mean_accuracy = mean(accuracy_test)
         mean_recall = mean(recall_test)
         mean_dice = mean(dice_test)
 
-        print("")
+        print("Perfect Accuracy Percentage:", accuracy_count / self.batches)
         print("Mean Accuracy:", mean_accuracy)
         print("Mean Recall:", mean_recall)
         print("Mean IoU:", mean_iou)
