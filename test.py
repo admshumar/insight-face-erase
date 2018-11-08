@@ -203,7 +203,7 @@ class Tester:
                 recall_test.append(recall.item())
                 iou_test.append(iou.item())
                 dice_test.append(dice.item())
-                print("Lengths:", len(accuracy_test), len(recall_test), len(iou_test), len(dice_test))
+                print("Lengths:", accuracy_test, recall_test, iou_test, dice_test)
 
                 print("Accuracy:", accuracy.item())
                 print("Recall:", recall.item())
