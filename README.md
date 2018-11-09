@@ -20,7 +20,7 @@ The above image comes from the original 2015 paper and is a rough approximation 
 The top-left image is an input to U-Net. The top right is its mask label. The bottom-left image is an output. The reason for this appearance is that U-Net outputs a pixel-by-pixel probability for the presence of that pixel in the "face" class. One sees that pixels that are located within regions that correspond to the whitespaces of the mask label are given a non-zero value. The image on the bottom-right is a binary mask that is produced with a threshold value which depends on the distribution of pixel intensities in U-Net's output. This mask is then applied to the input image to occlude faces. Finally, the occlusions are inpainted with OpenCV to produce a smoother anonymization. To summarize:
 
 <p align="center">
-<img src="https://github.com/admshumar/insight-face-erase/blob/master/img/pipeline_3.png" width="600" height="370">
+<img src="https://github.com/admshumar/insight-face-erase/blob/master/img/pipeline3.png" width="600" height="370">
   </p>
 
 Potential use cases involve any company that would need to comply with privacy regulations such as the European Union's <a href="https://en.wikipedia.org/wiki/General_Data_Protection_Regulation">GDPR</a>. Consider, for example, a photography/film company that intends to disseminate visual media featuring indivduals who did not consent to an appearance in its footage. Such a company would be bound by law to anonymize any such person prior to dissemination. There is a strong incentive to comply, as penalities for non-compliance can be considerable.
