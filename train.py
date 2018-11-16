@@ -21,7 +21,7 @@ import numpy as np
 # Custom data loader
 from utils import Loader
 from utils import Editor
-from utils import Visualizer
+#from utils import Visualizer
 
 # Get arguments
 parser = argparse.ArgumentParser(description='UNet for WIDER FACE Dataset')
@@ -171,7 +171,7 @@ class Trainer:
                 iteration = iteration + 1
                 output, target = self.process_batch(batch)
                 loss = Trainer.evaluate_loss(criterion, output, target)
-                print("/nEPOCH:", self.epochs)
+                print("EPOCH:", self.epochs)
                 print("Batch", batch, "of", self.train_size)
 
                 # Aggregate intersection over union scores for each element in the batch
@@ -204,7 +204,7 @@ class Trainer:
             average_iou = sum(iou_train)/len(iou_train)
             print("Average IoU:", average_iou)
             average_iou_train.append(average_iou)
-            Visualizer.save_loss_plot(average_iou_train, "average_iou_train.png")
+            #Visualizer.save_loss_plot(average_iou_train, "average_iou_train.png")
 
             # Validate
             for batch in range(self.train_size, self.batches):
@@ -228,7 +228,7 @@ class Trainer:
             average_iou = sum(iou_val) / len(iou_val)
             print("Average IoU:", average_iou)
             average_iou_val.append(average_iou)
-            Visualizer.save_loss_plot(average_iou_val, "average_iou_val.png")
+            #Visualizer.save_loss_plot(average_iou_val, "average_iou_val.png")
 
         print("Least loss", best_loss, "at iteration", best_iteration)
 

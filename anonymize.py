@@ -8,7 +8,6 @@ import glob
 import cv2
 import math
 import numpy as np
-#import matplotlib.pyplot as plt
 
 # Argument parser
 import argparse
@@ -69,12 +68,6 @@ class Anonymizer:
         im = cv2.inpaint(im, mask, 10, cv2.INPAINT_TELEA)
 
         return im
-
-    @classmethod
-    def show_applied_mask(cls, image, mask):
-        x = Anonymizer.apply_mask(image, mask)
-        plt.imshow(x, cmap="gray")
-        plt.show()
 
     def __init__(self, batch_size, image_paths, write_path, state_dict):
         self.batch_size = batch_size

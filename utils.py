@@ -7,7 +7,6 @@ import cv2
 import torch
 import models
 import numpy as np
-import matplotlib.pyplot as plt
 from parser import Annotation
 
 
@@ -365,12 +364,3 @@ class Editor:
         y = y.detach().cpu().numpy()
         y = np.reshape(y, [256, 256])
         return y
-
-
-class Visualizer:
-
-    @classmethod
-    def save_loss_plot(cls, loss_list, filepath):
-        plt.plot(loss_list)
-        plt.axis([0, len(loss_list), 0, (1.1) * max(loss_list)])
-        plt.savefig(filepath)

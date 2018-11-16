@@ -21,7 +21,6 @@ import numpy as np
 # Custom data loader
 from utils import Loader
 from utils import Editor
-from utils import Visualizer
 
 
 # Get arguments
@@ -140,7 +139,7 @@ class Tester:
         # Grab a batch, shuffled according to the provided seed. Note that
         # i-th image: samples[i][0], i-th mask: samples[i][1]
         samples = Loader.get_batch(self.image_paths, self.batch_size, batch, self.seed)
-        samples.astype(float)
+        #samples.astype(float)
         # Cast samples into torch.FloatTensor for interaction with U-Net
         samples = torch.from_numpy(samples)
         samples = samples.float()
@@ -168,7 +167,11 @@ class Tester:
         return output, target
 
     def test_model(self):
-        buffered_state_dict = torch.load("weights/" + self.state_dict)
+        if torch.cuda.is_available():
+            buffered_state_dict = torch.load("weights/" + self.state_dict)
+        else:
+            buffered_state_dict = torch.load("weights/" + self.state_dict, map_location=lambda storage, loc: storage)
+
         self.model.load_state_dict(buffered_state_dict)
         self.model.eval()
 
