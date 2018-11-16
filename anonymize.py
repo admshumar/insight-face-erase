@@ -8,7 +8,7 @@ import glob
 import cv2
 import math
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 # Argument parser
 import argparse
