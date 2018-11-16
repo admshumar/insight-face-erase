@@ -10,6 +10,9 @@ plots/
 #WIDER_FACE images
 WIDER_images_256/
 
+#WIDER_FACE annotations
+WIDER_annotations/
+
 #Rename files
 rename.py
 
