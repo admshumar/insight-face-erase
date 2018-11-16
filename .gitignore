@@ -1,3 +1,6 @@
+#Local folder attributes
+.DS_Store
+
 #Weight files from training
 weights/
 
