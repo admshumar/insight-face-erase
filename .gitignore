@@ -1,6 +1,12 @@
 #Local folder attributes
 .DS_Store
 
+#Development notes
+notes
+
+#Example images
+#sanity*
+
 #Weight files from training
 weights/
 
