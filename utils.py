@@ -109,7 +109,8 @@ class Loader:
         mask_paths = []
         for image_path in image_paths:
             mask_path = image_path.split("/")
-            mask_path = "/".join(mask_path[0:4]) + "/masks/" + mask_path[4]
+            mask_file_name = re.sub(re.compile(".jpg"), "_mask.jpg", mask_path[4])
+            mask_path = "/".join(mask_path[0:4]) + "/masks/" + mask_file_name
             mask_paths.append(mask_path)
         return mask_paths
 
@@ -295,7 +296,7 @@ class Editor:
         column_length = image.shape[1]
 
         distribution = np.histogram(image)
-        threshold = distribution[1][len(distribution[1])-2]
+        threshold = distribution[1][len(distribution[1])-5]
 
         new_mask = np.zeros(image.shape)
         for i in range(0, row_length):

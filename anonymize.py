@@ -4,8 +4,10 @@
 import torch
 
 # import os, re, glob
+import os
 import glob
 import cv2
+import time
 import math
 import numpy as np
 
@@ -51,7 +53,7 @@ class Anonymizer:
 
     @classmethod
     def apply_mask(cls, image, mask):
-        return np.minimum(image, mask)
+        return np.multiply(image, mask)
 
     @classmethod
     def anonymize_image(cls, image, mask):
@@ -64,8 +66,15 @@ class Anonymizer:
         mask = np.uint8(mask)
 
         im = Anonymizer.apply_mask(image, mask)
-        print(im.shape, mask.shape)
+        cv2.imwrite("sanity_mask.jpg", 255*mask)
+        cv2.imwrite("sanity_image.jpg", image)
+        cv2.imwrite("sanity_join.jpg", im)
+
+        mask = Editor.invert_mask(mask)
+        mask = np.uint8(mask)
+
         im = cv2.inpaint(im, mask, 10, cv2.INPAINT_TELEA)
+        cv2.imwrite("sanity_anon.jpg", im)
 
         return im
 
@@ -110,14 +119,22 @@ class Anonymizer:
         return source, output, target
 
     def anonymize(self):
+        if not os.path.isdir(self.write_path):
+            print("Making output directory")
+            os.mkdir(self.write_path)
         count = 0
         for batch in range(self.batches):
             source, output, target = self.process_batch(batch)
-            binary_mask = Editor.make_binary_mask_from_torch(output[0, :, :, :], 1.0)
-            inverted_binary_mask = Editor.invert_mask(binary_mask)
-            anonymized_image = Anonymizer.anonymize_image(source, binary_mask)
 
-            cv2.imwrite(self.write_path + "/orig_" + str(count) + ".jpg", Anonymizer.check_for_numpy(source))
+            source = Anonymizer.check_for_numpy(source)
+            source = source.reshape(source.shape[-2:])
+            source = np.float32(source)
+
+            binary_mask = Editor.make_binary_mask_from_torch(output[0, :, :, :], 1.0)
+            inverted_binary_mask = Editor.invert_mask(binary_mask) # Now a numpy array instead of torch tensor
+            anonymized_image = Anonymizer.anonymize_image(source, inverted_binary_mask)
+
+            cv2.imwrite(self.write_path + "/orig_" + str(count) + ".jpg", source)
             cv2.imwrite(self.write_path + "/anon_" + str(count) + ".jpg", anonymized_image)
             count += 1
 
@@ -128,7 +145,11 @@ class Anonymizer:
             self.model = self.model.cuda()
 
     def set_weights(self):
-        buffered_state_dict = torch.load("weights/" + self.state_dict)
+        if torch.cuda.is_available():
+            buffered_state_dict = torch.load("weights/" + self.state_dict)
+        else:
+            buffered_state_dict = torch.load("weights/" + self.state_dict, map_location=lambda storage, loc: storage)
+
         self.model.load_state_dict(buffered_state_dict)
         self.model.eval()
 
